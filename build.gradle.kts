@@ -25,7 +25,6 @@ dependencies {
     implementation("io.ktor:ktor-server-compression")
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
@@ -40,7 +39,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.50.0")
     implementation("org.jetbrains.exposed:exposed-dao:0.50.0")
 
-//    // 方案1选项B：Kotlinx.DateTime（跨平台）
+    // 方案1选项B：Kotlinx.DateTime（跨平台）
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 

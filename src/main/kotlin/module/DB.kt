@@ -5,6 +5,7 @@ import com.joykeepsflowin.db.entry.UserTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
+import io.ktor.server.config.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -12,12 +13,13 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun Application.configureDB() {
     // 1. 配置 Hikari 连接池
     val config = HikariConfig().apply {
-        jdbcUrl = "jdbc:mysql://localhost:3306/board?allowPublicKeyRetrieval=TRUE&useSSL=FALSE&serverTimezone=UTC"
-        username = "root"
-        password = "ljd123456"
-        maximumPoolSize = 10  // 根据服务器核心数调整
-        connectionTimeout = 30000
-        driverClassName = "com.mysql.cj.jdbc.Driver" // MySQL 8.0+ 驱动类
+        val envConfig = environment.config
+        jdbcUrl = envConfig.tryGetString("ktor.db.jdbcUrl")
+        username = envConfig.tryGetString("ktor.db.username")
+        password = envConfig.tryGetString("ktor.db.password")
+        maximumPoolSize = envConfig.tryGetString("ktor.db.maximumPoolSize")?.toInt() ?: 6  // 根据服务器核心数调整
+        connectionTimeout = envConfig.tryGetString("ktor.db.connectionTimeout")?.toLong() ?: 30000L
+        driverClassName = envConfig.tryGetString("ktor.db.driverClassName")
     }
 
     // 2. 创建数据源
