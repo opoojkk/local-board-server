@@ -1,11 +1,11 @@
 package com.joykeepsflowin.route
 
+import com.joykeepsflowin.auth.makeToken
 import com.joykeepsflowin.biz.user.LoginRequest
 import com.joykeepsflowin.biz.user.LoginResponse
 import com.joykeepsflowin.biz.user.RegisterRequest
 import com.joykeepsflowin.db.dao.UserDao
 import com.joykeepsflowin.db.entry.UserTable
-import com.joykeepsflowin.util.JwtTokenHelper
 import com.joykeepsflowin.util.PasswordHasher
 import io.ktor.http.*
 import io.ktor.server.request.*
@@ -48,7 +48,7 @@ fun Route.authRoutes() {
             return@post
         }
         // 生成 JWT Token（需配置 JWT 认证）
-        val token = JwtTokenHelper.makeToken(user)
+        val token = makeToken(user)
         call.respond(LoginResponse(token))
     }
 }

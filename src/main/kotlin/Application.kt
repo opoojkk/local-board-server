@@ -10,8 +10,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureSerialization()
     configureHTTP()
+    configureSecurity()
     configureRouting()
     configureDB()
-    configureSecurity()
-//    jwtConfigure()
 }

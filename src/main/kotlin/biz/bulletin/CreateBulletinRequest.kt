@@ -1,5 +1,8 @@
 package com.joykeepsflowin.biz.bulletin
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CreateBulletinRequest(
     val title: String,
     val content: String,

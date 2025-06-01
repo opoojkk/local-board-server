@@ -1,4 +1,3 @@
 package com.joykeepsflowin.biz.bulletin
 
-class ForbiddenException(msg: String) : Exception(msg) {
-}
+class ForbiddenException(msg: String) : Exception(msg)
