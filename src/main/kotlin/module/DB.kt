@@ -9,8 +9,10 @@ import io.ktor.server.config.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 
 fun Application.configureDB() {
+    val logger = LoggerFactory.getLogger("db")
     // 1. 配置 Hikari 连接池
     val config = HikariConfig().apply {
         val envConfig = environment.config

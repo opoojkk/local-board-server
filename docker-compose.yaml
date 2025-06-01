@@ -1,0 +1,36 @@
+services:
+  app:
+    container_name: app
+    build: .
+    ports:
+      - "8227:8080"
+    environment:
+      - DB_HOST=mysql
+      - DB_JDBC_URL=jdbc:mysql://mysql:3306/local_board_db?createDatabaseIfNotExist=TRUE&allowPublicKeyRetrieval=TRUE&useSSL=FALSE&serverTimezone=UTC
+      - DB_USERNAME=ktor_user
+      - DB_PASSWORD=ktor_password
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: local_board_db
+      MYSQL_USER: ktor_user
+      MYSQL_PASSWORD: ktor_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p","root_password" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
