@@ -67,14 +67,14 @@ fun Route.bulletinRoutes() {
                 val request = call.receive<CreateBulletinRequest>()
                 val userId = call.principal<com.joykeepsflowin.auth.UserIdPrincipal>()?.userId // 从认证中获取用户ID
                 if (userId == null) {
-                    call.respond(HttpStatusCode.Forbidden, "Wrong user id")
+                    call.respond(ResponseShell<String>(HttpStatusCode.Forbidden.value, "Wrong user id"))
                     return@post
                 }
                 val user = transaction {
                     UserDao.find { UserTable.id eq userId.toInt() }.firstOrNull()
                 }
                 if (user == null) {
-                    call.respond(HttpStatusCode.Forbidden, "User not found")
+                    call.respond(ResponseShell<String>(code = HttpStatusCode.Forbidden.value, msg = "User not found"))
                     return@post
                 }
                 val id = transaction {
@@ -137,7 +137,7 @@ fun Route.bulletinRoutes() {
 
                     Bulletins.deleteWhere { Bulletins.id eq id }
                 }
-                call.respond(HttpStatusCode.NoContent)
+                call.respond(ResponseShell<String>(HttpStatusCode.NoContent.value))
             }
         }
     }
@@ -164,7 +164,7 @@ fun Route.bulletinRoutes() {
                         it[isPinned] = true
                     }
                 }
-                call.respond(HttpStatusCode.NoContent)
+                call.respond(ResponseShell<String>(HttpStatusCode.NoContent.value))
             }
         }
     }
@@ -191,7 +191,7 @@ fun Route.bulletinRoutes() {
                         it[isPinned] = false
                     }
                 }
-                call.respond(HttpStatusCode.NoContent)
+                call.respond(ResponseShell<String>(HttpStatusCode.NoContent.value))
             }
         }
     }

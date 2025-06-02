@@ -1,6 +1,7 @@
 package com.joykeepsflowin.route
 
 import com.joykeepsflowin.auth.makeToken
+import com.joykeepsflowin.biz.ResponseShell
 import com.joykeepsflowin.biz.user.LoginRequest
 import com.joykeepsflowin.biz.user.LoginResponse
 import com.joykeepsflowin.biz.user.RegisterRequest
@@ -22,7 +23,7 @@ fun Route.authRoutes() {
             UserDao.find { UserTable.username eq request.username }.firstOrNull()
         }
         if (existingUser != null) {
-            call.respond(HttpStatusCode.Conflict, "Username already exists")
+            call.respond(ResponseShell<String>(HttpStatusCode.Conflict.value, "Username already exists"))
             return@post
         }
         // 创建用户
@@ -33,7 +34,7 @@ fun Route.authRoutes() {
                 passwordHash = PasswordHasher.hash(request.password)
             }
         }
-        call.respond(HttpStatusCode.Created, "User registered successfully")
+        call.respond(ResponseShell<String>(HttpStatusCode.Created.value, "User registered successfully"))
     }
 
     post("/login") {
@@ -44,11 +45,11 @@ fun Route.authRoutes() {
         }
         // 验证用户和密码
         if (user == null || !PasswordHasher.verify(request.password, user.passwordHash)) {
-            call.respond(HttpStatusCode.Unauthorized, "Invalid username or password")
+            call.respond(ResponseShell<String>(HttpStatusCode.Unauthorized.value, "Invalid username or password"))
             return@post
         }
         // 生成 JWT Token（需配置 JWT 认证）
         val token = makeToken(user)
-        call.respond(LoginResponse(token))
+        call.respond(ResponseShell(data = LoginResponse(token)))
     }
 }

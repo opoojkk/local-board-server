@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class ResponseShell<T> {
     var code: Int = 0
-    var msg: String = ""
+    var msg: String = "ok"
     var data: T? = null
 
     @JvmOverloads
