@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim as builder
+FROM --platform=$BUILDPLATFORM eclipse-temurin:17-jdk-jammy as builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN chmod +x gradlew
 # 构建应用
 RUN ./gradlew build -x test --no-daemon
 
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
