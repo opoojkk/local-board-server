@@ -1,43 +1,102 @@
-# local-board-server
+# Local Board Server
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
-
-Here are some useful links to get you started:
-
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+A Ktor-based bulletin board service with JWT authentication and MySQL storage.
 
 ## Features
+- 🛡️ JWT Authentication
+- 📝 Bulletin CRUD Operations
+- 📌 Pin/Unpin Management
+- 📊 Pagination Support
+- 📦 Docker Deployment
 
-Here's a list of features included in this project:
+## Tech Stack
+- **Backend**: Ktor 3.1.3
+- **Database**: MySQL 8.0 + Exposed ORM
+- **Auth**: JWT + BCrypt
+- **Build**: Gradle 8.5
+- **Container**: Docker + Docker Compose
 
-| Name                                                                   | Description                                                                        |
-|------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
-| [Compression](https://start.ktor.io/p/compression)                     | Compresses responses using encoding algorithms like GZIP                           |
+## API Endpoints
 
-## Building & Running
+### Authentication
+| Method | Path       | Description                   |
+|--------|------------|-------------------------------|
+| POST   | /register  | User registration            |
+| POST   | /login     | User login to obtain JWT token |
 
-To build or run the project, use one of the following tasks:
+### Bulletin Operations
+| Method | Path                 | Description                      |
+|--------|----------------------|----------------------------------|
+| GET    | /bulletins/list      | Paginated bulletin list retrieval |
+| POST   | /bulletins/add       | Create new bulletin             |
+| GET    | /bulletins/{id}      | Get bulletin details            |
+| DELETE | /bulletins/{id}      | Delete bulletin                 |
+| POST   | /bulletins/pin/{id}  | Pin bulletin to top              |
+| POST   | /bulletins/unpin/{id}| Unpin bulletin                   |
 
-| Task                          | Description                                                          |
-|-------------------------------|----------------------------------------------------------------------|
-| `./gradlew test`              | Run the tests                                                        |
-| `./gradlew build`             | Build everything                                                     |
-| `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `run`                         | Run the server                                                       |
-| `runDocker`                   | Run using the local docker image                                     |
+## Deployment with Docker Compose
 
-If the server starts successfully, you'll see the following output:
+```yaml:docker-compose.yaml
+services:
+  app:
+    container_name: app
+    image: opoojkk/local-board-server
+    ports:
+      - "8227:8080"
+    environment:
+      - DB_HOST=mysql
+      - DB_JDBC_URL=jdbc:mysql://mysql:3306/local_board_db?createDatabaseIfNotExist=TRUE&allowPublicKeyRetrieval=TRUE&useSSL=FALSE&serverTimezone=UTC
+      - DB_USERNAME=ktor_user
+      - DB_PASSWORD=ktor_password
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: local_board_db
+      MYSQL_USER: ktor_user
+      MYSQL_PASSWORD: ktor_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+
+### Deployment Steps
+1. Build image:
+```bash
+./gradlew build && docker build -t opoojkk/local-board-server .
 ```
 
+2. Start services:
+```bash
+docker-compose up -d
+```
+
+3. Access API endpoint:
+```
+http://localhost:8227/bulletins/list
+```
+
+## Environment Variables
+| Variable              | Description                      |
+|-----------------------|----------------------------------|
+| DB_JDBC_URL           | MySQL JDBC connection string    |
+| DB_USERNAME           | Database username               |
+| DB_PASSWORD           | Database password               |
+| MYSQL_ROOT_PASSWORD   | MySQL root password             |
+```
